@@ -7,7 +7,7 @@ function AccountPage() {
         return Navigate
     }
   return (
-    <div>AccountPage for {user?.email}</div>
+    <div>AccountPage for test</div>
   )
 }
 

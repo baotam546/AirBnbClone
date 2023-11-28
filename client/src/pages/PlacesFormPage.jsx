@@ -35,6 +35,7 @@ function PlacesFormPage() {
             setPrice(data.price);
             setPerks(data.perks);
             setExtraInfo(data.extraInfo);
+            setPrice(data.price);
         })
     },[id])
     function inputHeader(text) {
@@ -105,7 +106,7 @@ function PlacesFormPage() {
                 {preInput('Extra info', 'House rules, etc')}
                 <textarea value={extraInfo} onChange={e => setExtraInfo(e.target.value)} />
                 {preInput('Check in & out times', 'Add check in & out time, remember to have some time window for cleaning room between guests')}
-                <div className='grid sm:grid-cols-3 gap-2'>
+                <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
                     <div>
                         <div className='mt-2 -mb-1'>Check in time</div>
                         <input type="number" value={checkIn} onChange={e => setCheckIn(e.target.value)} placeholder='14:00' />
@@ -117,6 +118,10 @@ function PlacesFormPage() {
                     <div>
                         <div className='mt-2 -mb-1'>Max number guests</div>
                         <input type="number" value={maxGuests} onChange={e => setMaxGuests(e.target.value)} />
+                    </div>
+                    <div>
+                        <div className='mt-2 -mb-1'>Price per night ($)</div>
+                        <input type="number" value={price} onChange={e => setPrice(e.target.value)} />
                     </div>
                 </div>
                 <div>

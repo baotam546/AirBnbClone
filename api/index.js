@@ -134,10 +134,10 @@ app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
     }
     res.json(uploadFiles);
 })
-
+// create place
 app.post('/places', (req, res) => {
     const { token } = req.cookies;
-    const { title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests } = req.body;
+    const { title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
     jwt.verify(token, jwtSecretKey, {}, async (err, user) => {
         if (err) throw err;
         const place = await Place.create({
@@ -151,12 +151,18 @@ app.post('/places', (req, res) => {
             checkIn,
             checkOut,
             maxGuests,
+            price
         })
 
         res.json(place);
     })
 })
+// get all places
 app.get('/places', async (req, res) => {
+    res.json(await Place.find());
+})
+// get user places
+app.get('/user-places', async (req, res) => {
     const { token } = req.cookies;
     try {
         jwt.verify(token, jwtSecretKey, {}, async (err, user) => {
@@ -168,6 +174,7 @@ app.get('/places', async (req, res) => {
         console.log(error);
     }
 })
+// get place by id
 app.get('/places/:id', async (req, res) => {
     const { id } = req.params;
     res.json(await Place.findById(id));
@@ -176,11 +183,11 @@ app.get('/places/:id', async (req, res) => {
 app.put('/places', async (req, res) => {
 
     const { token } = req.cookies;
-    const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests } = req.body;
+    const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
     jwt.verify(token, jwtSecretKey, {}, async (err, user) => {
         const placeData = await Place.findById(id);
         if (err) throw err;
-        if (user.id === placeData.owner.toString()) {
+        if (user.id === placeData.owner.toString()) { 
             placeData.set(
                 {
                     title,
@@ -192,6 +199,7 @@ app.put('/places', async (req, res) => {
                     checkIn,
                     checkOut,
                     maxGuests,
+                    price
                 }
             );
             await placeData.save();

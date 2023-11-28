@@ -5,7 +5,7 @@ import AccountNav from '../AccountNav';
 function PlacesPage() {
     const [places, setPlaces] = useState([]);
     useEffect(() => {
-        axios.get('/places').then(({ data }) => {
+        axios.get('/user-places').then(({ data }) => {
             setPlaces(data)
         })
     }, [])
@@ -24,17 +24,16 @@ function PlacesPage() {
             </div>
             <div className='mt-4'>
                 {places.length > 0 && places.map(place => (
-                    <Link to={`/account/places/${place._id}`} className='flex cursor-pointer gap-4 bg-gray-200 p-4 rounded-2xl'>
+                    <Link to={`/account/places/${place._id}`} className='flex cursor-pointer gap-4 my-4 bg-gray-200 p-4 rounded-2xl'>
                         <div className='flex w-32 h-32 justify-center bg-gray-300 grow shrink-0'>
                             {place.photos.length > 0 && (
                                 <img className='object-cover' src={'http://localhost:4000/uploads/'+place.photos[0]} />
                             )}
                         </div>
-                        <div className='grow-0 shrink'>
+                        <div className='grow shrink'>
                             <h2 className='text-xl'>{place.title}</h2>
                             <p className='text-sm mt-2 '>{place.description}</p>
                         </div>
-
                     </Link>
                 ))}
             </div>

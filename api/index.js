@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Place = require('./models/Place');
+const Booking = require('./models/Booking')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs')
 const cookieParser = require('cookie-parser');
@@ -32,6 +33,15 @@ app.get('/test', (req, res) => {
     res.json({ message: 'hello' })
 })
 
+function getUserDataFromToken(req){
+    const token = req.cookies.token;
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, jwtSecretKey, {}, (err, userData) => {
+            if(err) throw err;
+            resolve(userData);
+        })
+    })
+}
 app.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
     try {
@@ -181,13 +191,12 @@ app.get('/places/:id', async (req, res) => {
 })
 
 app.put('/places', async (req, res) => {
-
     const { token } = req.cookies;
     const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
     jwt.verify(token, jwtSecretKey, {}, async (err, user) => {
         const placeData = await Place.findById(id);
         if (err) throw err;
-        if (user.id === placeData.owner.toString()) { 
+        if (user.id === placeData.owner.toString()) {
             placeData.set(
                 {
                     title,
@@ -207,6 +216,40 @@ app.put('/places', async (req, res) => {
         }
     })
 })
+
+app.get('/bookings', async (req, res) => {
+    const userData = await getUserDataFromToken(req);
+    const { id } = userData;
+    res.json(await Booking.find({ user: id }).populate('place'));
+})
+app.post('/bookings', async (req, res) => {
+    try {
+        const { token } = req.cookies;
+        const { placeId, name, phone, checkIn, checkOut, numberOfGuests, price } = req.body;
+        jwt.verify(token, jwtSecretKey, {}, async (err, user) => {
+            try {
+                if (err) throw err;
+                const response = await Booking.create({
+                    place: placeId,
+                    checkIn,
+                    checkOut,
+                    numberOfGuests,
+                    name,
+                    phone,
+                    user: user.id,
+                    price
+                });
+                res.json(response);
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 app.listen(port)
 
